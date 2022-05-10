@@ -7,12 +7,26 @@ spl_autoload_register(function (string $fqcn) {
 });
 
 use App\Infra\DependencyInjection\Container;
+use App\Infra\EventDispatcher\EventDispatcher;
+use App\Infra\EventDispatcher\Events\RequestEvent;
 use App\Infra\Http\Request;
 use App\Infra\Http\Router;
 use App\Infra\Log\Logger;
 
+$eventDispatcher = new EventDispatcher();
 
 $request = Request::createFromGlobals();
+
+$requestEvent = new RequestEvent($request);
+$eventDispatcher->dispatch($requestEvent);
+
+if ($requestEvent->hasResponse()) {
+    $requestEvent->getResponse()->send();
+    exit(0);
+}
+
+$request = $requestEvent->getRequest();
+
 $container = new Container(
     $request,
     new Logger(),

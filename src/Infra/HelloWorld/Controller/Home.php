@@ -19,7 +19,7 @@ class Home
 
     public function __invoke(): Response
     {
-        $name = $this->request->queryGet('name') ?? 'Anonymous';
+        $name = $this->request->queryGet('name', 'Anonymous');
         return new Response('Home '.$name);
     }
 }
